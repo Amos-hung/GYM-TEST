@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>極速燃脂 APP</title>
+    <title>極速燃脂 APP v4.0</title>
     <style>
-        :root { --primary: #00E676; --bg: #121212; --card: #1E1E1E; --text: #FFF; --sub: #B0B0B0; --danger: #FF5252; }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .app { width: 100%; max-width: 480px; padding-bottom: 60px; }
+        :root { --primary: #00E676; --bg: #121212; --card: #1E1E1E; --text: #FFF; --sub: #B0B0B0; --danger: #FF5252; --backup: #FFB74D; --timer-active: #FF4081; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; user-select: none; -webkit-user-select: none; }
+        .app { width: 100%; max-width: 480px; padding-bottom: 80px; }
         
         /* Header */
         h1 { margin: 0; font-size: 22px; }
@@ -16,28 +16,53 @@
 
         /* Cards */
         .card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 18px; border: 1px solid #333; }
-        .head { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
         .title { color: var(--primary); font-weight: bold; font-size: 18px; }
-        .rest { font-size: 12px; background: #333; padding: 3px 8px; border-radius: 4px; }
+        
+        /* Rest Timer Button in Header */
+        .rest-btn { 
+            font-size: 12px; 
+            background: #333; 
+            color: #fff;
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            border: 1px solid #555;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 60px;
+            text-align: center;
+        }
+        .rest-btn.active {
+            background: var(--timer-active);
+            border-color: var(--timer-active);
+            color: white;
+            animation: pulse 1s infinite;
+        }
 
-        /* Timer */
+        /* Large Timer */
         .timer-box { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px; }
         .time { font-size: 30px; font-family: monospace; font-weight: bold; margin-bottom: 8px; display: block; }
         .btn { background: var(--primary); color: #000; border: none; padding: 8px 24px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
         .btn.stop { background: var(--danger); color: #fff; }
 
         /* Exercises */
-        .pair { display: flex; flex-direction: column; gap: 12px; }
-        .ex-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed #666; font-weight: 600; font-size: 16px; display: inline-block; }
-        .ex-meta { font-size: 13px; color: var(--sub); display: flex; justify-content: space-between; margin-top: 4px; }
+        .pair { display: flex; flex-direction: column; gap: 15px; }
+        .ex-block { display: flex; flex-direction: column; gap: 4px; }
+        
+        /* Links */
+        .ex-link { color: var(--text); text-decoration: none; font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .backup-link { color: var(--backup); text-decoration: none; font-size: 13px; margin-top: 2px; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+        .backup-label { border: 1px solid var(--backup); border-radius: 4px; padding: 0 4px; font-size: 10px; margin-right: 4px; }
+        .ex-meta { font-size: 13px; color: var(--sub); display: flex; justify-content: space-between; margin-top: 2px; padding-left: 2px; }
         .note { color: var(--danger); font-size: 12px; margin-top: 2px; }
         .arrow { text-align: center; color: var(--primary); font-size: 12px; opacity: 0.8; margin: -5px 0; }
 
         /* Checkboxes */
         .sets { display: flex; justify-content: space-between; margin-top: 15px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
-        .set { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .set span { font-size: 10px; color: var(--sub); }
-        .circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #666; }
+        .set { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; } 
+        /* 增加點擊範圍 */
+        .set span { font-size: 10px; color: var(--sub); pointer-events: none;}
+        .circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #666; transition: 0.2s; pointer-events: none;}
         input[type="checkbox"] { display: none; }
         input:checked + .circle { background: var(--primary); border-color: var(--primary); }
 
@@ -46,15 +71,21 @@
         .g-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; text-align: center; }
         .g-val { font-size: 16px; font-weight: bold; }
         .g-lbl { font-size: 10px; color: var(--sub); }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
 <div class="app">
     <header>
-        <h1>🔥 全身代謝燃脂 (v2.1)</h1>
+        <h1>🔥 全身代謝燃脂 (v4.0)</h1>
         <div class="stats">
-            <span class="badge">預估 500+ kcal</span>
+            <span class="badge">含組間計時</span>
             <span class="badge">約 60 分鐘</span>
         </div>
     </header>
@@ -62,27 +93,35 @@
     <!-- 熱身 -->
     <div class="card" style="border-left: 4px solid #FFC107;">
         <div class="head"><span class="title" style="color:#FFC107">🚀 暖身啟動</span></div>
-        <div>
+        <div class="ex-block">
             <a href="https://www.google.com/search?tbm=isch&q=Elliptical+Machine+Workout" target="_blank" class="ex-link">滑步機 / 快走 🔍</a>
             <div class="ex-meta">讓身體微熱，關節活動開來</div>
         </div>
         <div class="timer-box">
             <span id="t-warm" class="time">05:00</span>
-            <button class="btn" onclick="runTimer(300, 't-warm', this)">開始計時</button>
+            <button class="btn" onclick="runTimer(300, 't-warm', this)">開始暖身計時</button>
         </div>
     </div>
 
     <!-- Group 1 -->
     <div class="card">
-        <div class="head"><span class="title">組合 1：腿推+胸推</span><span class="rest">休90秒</span></div>
+        <div class="head">
+            <span class="title">組合 1：腿推+胸推</span>
+            <!-- 休息計時按鈕 -->
+            <button class="rest-btn" onclick="startRest(90, this)">休 90秒</button>
+        </div>
         <div class="pair">
-            <div>
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Leg+Press+Machine" target="_blank" class="ex-link">A. 坐姿腿推機 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Goblet+Squat" target="_blank" class="backup-link"><span class="backup-label">備用</span> 啞鈴高腳杯深蹲</a>
                 <div class="ex-meta"><span>12 下 (做重)</span><span>腿部用力</span></div>
             </div>
+            
             <div class="arrow">⬇️ 不休息 ⬇️</div>
-            <div>
+            
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Chest+Press+Machine" target="_blank" class="ex-link">B. 機械式胸推 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Bench+Press" target="_blank" class="backup-link"><span class="backup-label">備用</span> 啞鈴平板臥推</a>
                 <div class="ex-meta"><span>12-15 下</span><span>背貼緊</span></div>
             </div>
         </div>
@@ -96,15 +135,23 @@
 
     <!-- Group 2 -->
     <div class="card">
-        <div class="head"><span class="title">組合 2：後側鏈</span><span class="rest">休60秒</span></div>
+        <div class="head">
+            <span class="title">組合 2：後側鏈</span>
+            <!-- 休息計時按鈕 -->
+            <button class="rest-btn" onclick="startRest(60, this)">休 60秒</button>
+        </div>
         <div class="pair">
-            <div>
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Seated+Leg+Curl+Machine" target="_blank" class="ex-link">A. 坐姿腿後勾 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+RDL" target="_blank" class="backup-link"><span class="backup-label">備用</span> 啞鈴直腿硬舉</a>
                 <div class="ex-meta"><span>15-20 下</span><span>後側要酸</span></div>
             </div>
+
             <div class="arrow">⬇️ 不休息 ⬇️</div>
-            <div>
+
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Seated+Cable+Row+Machine" target="_blank" class="ex-link">B. 坐姿划船 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=One+Arm+Dumbbell+Row+Bench" target="_blank" class="backup-link"><span class="backup-label">備用</span> 單手啞鈴划船</a>
                 <div class="ex-meta"><span>15-20 下 (輕)</span><span>頂峰收縮</span></div>
                 <div class="note">⚠️ 保護肩胛：動作放慢</div>
             </div>
@@ -119,15 +166,23 @@
 
     <!-- Group 3 -->
     <div class="card">
-        <div class="head"><span class="title">組合 3：代謝充血</span><span class="rest">休45秒</span></div>
+        <div class="head">
+            <span class="title">組合 3：代謝充血</span>
+            <!-- 休息計時按鈕 -->
+            <button class="rest-btn" onclick="startRest(45, this)">休 45秒</button>
+        </div>
         <div class="pair">
-            <div>
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Leg+Extension+Machine" target="_blank" class="ex-link">A. 坐姿腿伸展 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Reverse+Lunge" target="_blank" class="backup-link"><span class="backup-label">備用</span> 啞鈴後弓箭步</a>
                 <div class="ex-meta"><span>20 下</span><span>速度加快</span></div>
             </div>
+
             <div class="arrow">⬇️ 不休息 ⬇️</div>
-            <div>
+
+            <div class="ex-block">
                 <a href="https://www.google.com/search?tbm=isch&q=Pec+Deck+Machine" target="_blank" class="ex-link">B. 蝴蝶機 / 二頭 🔍</a>
+                <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Fly" target="_blank" class="backup-link"><span class="backup-label">備用</span> 啞鈴飛鳥 / 二頭</a>
                 <div class="ex-meta"><span>15-20 下</span><span>力竭</span></div>
             </div>
         </div>
@@ -148,7 +203,7 @@
             <div class="g-item"><div class="g-val">130+</div><div class="g-lbl">心率</div></div>
         </div>
         <div style="text-align:center; margin-bottom:15px;">
-            <a href="https://www.google.com/search?tbm=isch&q=Incline+Treadmill+Walking" target="_blank" class="ex-link">跑步機爬坡快走 🔍</a>
+            <a href="https://www.google.com/search?tbm=isch&q=Incline+Treadmill+Walking" target="_blank" class="ex-link" style="justify-content:center">跑步機爬坡快走 🔍</a>
             <div class="note">手不抓扶手，核心收緊</div>
         </div>
         <div class="timer-box">
@@ -160,41 +215,78 @@
 
 <script>
     let timers = {};
-    
+    let restTimers = {};
+
+    // 格式化時間 mm:ss
+    function fmt(s) {
+        return (s-(s%=60))/60+(9<s?':':':0')+s;
+    }
+
+    // 大計時器 (暖身/有氧)
     function runTimer(seconds, id, btn) {
-        // 如果正在跑，則停止 (重置)
         if(timers[id]) {
             clearInterval(timers[id]);
             delete timers[id];
             btn.textContent = "重新開始";
             btn.classList.remove('stop');
-            btn.style.opacity = "1";
             return;
         }
-
-        // 開始計時
         let left = seconds;
         btn.textContent = "停止 / 重置";
         btn.classList.add('stop');
-        
         timers[id] = setInterval(() => {
             left--;
-            let m = Math.floor(left / 60).toString().padStart(2, '0');
-            let s = (left % 60).toString().padStart(2, '0');
-            document.getElementById(id).textContent = `${m}:${s}`;
-
+            document.getElementById(id).textContent = fmt(left).padStart(5,'0');
             if(left <= 0) {
                 clearInterval(timers[id]);
                 delete timers[id];
                 btn.textContent = "完成！";
                 btn.classList.remove('stop');
-                if(navigator.vibrate) navigator.vibrate([200,100,200]);
+                if(navigator.vibrate) navigator.vibrate([300,100,300]);
                 alert("時間到！");
             }
         }, 1000);
     }
+
+    // 組間休息小計時器
+    function startRest(sec, btn) {
+        // 如果正在跑，則停止並復原
+        if(btn.dataset.tid) {
+            clearInterval(btn.dataset.tid);
+            delete btn.dataset.tid;
+            btn.textContent = btn.dataset.org;
+            btn.classList.remove('active');
+            return;
+        }
+
+        // 儲存原始文字 (只存一次)
+        if(!btn.dataset.org) btn.dataset.org = btn.textContent;
+
+        let left = sec;
+        btn.classList.add('active');
+        btn.textContent = fmt(left);
+        
+        // 開始倒數
+        let tid = setInterval(() => {
+            left--;
+            btn.textContent = fmt(left);
+            if(left <= 0) {
+                clearInterval(tid);
+                delete btn.dataset.tid;
+                btn.textContent = "時間到";
+                btn.classList.remove('active');
+                if(navigator.vibrate) navigator.vibrate(500);
+                
+                // 2秒後自動變回原本的文字
+                setTimeout(() => {
+                    btn.textContent = btn.dataset.org;
+                }, 2000);
+            }
+        }, 1000);
+        btn.dataset.tid = tid;
+    }
     
-    // Checkbox 點擊震動
+    // Checkbox 震動
     document.querySelectorAll('input').forEach(i => {
         i.addEventListener('change', function() {
             if(this.checked && navigator.vibrate) navigator.vibrate(30);
