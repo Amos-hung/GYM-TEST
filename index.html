@@ -3,265 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>極速燃脂 APP v2.0</title>
+    <title>極速燃脂 APP</title>
     <style>
-        :root {
-            --primary: #00E676; /* 螢光綠 */
-            --bg-dark: #121212;
-            --card-bg: #1E1E1E;
-            --text-main: #FFFFFF;
-            --text-sub: #B0B0B0;
-            --danger: #FF5252;
-            --link-blue: #448AFF;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px 10px; /* 手機版邊距調整 */
-            display: flex;
-            justify-content: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            padding-bottom: 50px;
-        }
-
+        :root { --primary: #00E676; --bg: #121212; --card: #1E1E1E; --text: #FFF; --sub: #B0B0B0; --danger: #FF5252; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app { width: 100%; max-width: 480px; padding-bottom: 60px; }
+        
         /* Header */
-        header { margin-bottom: 25px; }
-        h1 { font-size: 24px; margin: 0; font-weight: 800; }
-        .subtitle { color: var(--text-sub); font-size: 14px; margin-top: 5px; }
-        .user-stats { display: flex; gap: 10px; margin-top: 15px; }
-        .stat-badge { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; font-size: 12px; color: var(--primary); font-weight: bold; }
+        h1 { margin: 0; font-size: 22px; }
+        .stats { display: flex; gap: 8px; margin: 10px 0 20px 0; }
+        .badge { background: #333; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: var(--primary); font-weight: bold; }
 
         /* Cards */
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+        .card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 18px; border: 1px solid #333; }
+        .head { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+        .title { color: var(--primary); font-weight: bold; font-size: 18px; }
+        .rest { font-size: 12px; background: #333; padding: 3px 8px; border-radius: 4px; }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .card-title { font-size: 18px; font-weight: 700; color: var(--primary); }
-        .rest-timer-badge { font-size: 12px; background: #333; padding: 4px 8px; border-radius: 4px; }
+        /* Timer */
+        .timer-box { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; margin-top: 10px; }
+        .time { font-size: 30px; font-family: monospace; font-weight: bold; margin-bottom: 8px; display: block; }
+        .btn { background: var(--primary); color: #000; border: none; padding: 8px 24px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .btn.stop { background: var(--danger); color: #fff; }
 
-        /* Timer Section */
-        .timer-box {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .timer-display {
-            font-size: 32px;
-            font-weight: bold;
-            font-family: monospace;
-            margin-bottom: 10px;
-            color: var(--text-main);
-        }
-        .timer-btn {
-            background: var(--primary);
-            color: #000;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .timer-btn.stop { background: var(--danger); color: white; }
+        /* Exercises */
+        .pair { display: flex; flex-direction: column; gap: 12px; }
+        .ex-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed #666; font-weight: 600; font-size: 16px; display: inline-block; }
+        .ex-meta { font-size: 13px; color: var(--sub); display: flex; justify-content: space-between; margin-top: 4px; }
+        .note { color: var(--danger); font-size: 12px; margin-top: 2px; }
+        .arrow { text-align: center; color: var(--primary); font-size: 12px; opacity: 0.8; margin: -5px 0; }
 
-        /* Exercises & Links */
-        .exercise-pair { display: flex; flex-direction: column; gap: 15px; }
-        .exercise-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-        
-        /* 超連結樣式 */
-        .search-link {
-            text-decoration: none;
-            color: var(--text-main);
-            border-bottom: 1px dashed var(--text-sub);
-            transition: color 0.2s;
-        }
-        .search-link:hover { color: var(--primary); border-bottom-color: var(--primary); }
-        .search-icon { font-size: 12px; opacity: 0.6; }
-
-        .exercise-meta { font-size: 13px; color: var(--text-sub); display: flex; justify-content: space-between; }
-        .note { font-size: 12px; color: var(--danger); margin-top: 2px; font-style: italic; }
-        .connector { display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 12px; font-weight: bold; opacity: 0.8; margin: -5px 0; }
-
-        /* Sets Checkboxes */
-        .sets-container { display: flex; justify-content: space-between; margin-top: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
-        .set-box { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .set-label { font-size: 10px; color: var(--text-sub); }
-        .check-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--text-sub); transition: all 0.2s; }
+        /* Checkboxes */
+        .sets { display: flex; justify-content: space-between; margin-top: 15px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
+        .set { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .set span { font-size: 10px; color: var(--sub); }
+        .circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #666; }
         input[type="checkbox"] { display: none; }
-        input[type="checkbox"]:checked + .check-circle { background-color: var(--primary); border-color: var(--primary); box-shadow: 0 0 8px var(--primary); }
+        input:checked + .circle { background: var(--primary); border-color: var(--primary); }
 
-        /* Cardio Stats */
-        .cardio-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #fff; }
-        .stat-label { font-size: 11px; color: var(--text-sub); }
-
+        /* Cardio Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .g-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; text-align: center; }
+        .g-val { font-size: 16px; font-weight: bold; }
+        .g-lbl { font-size: 10px; color: var(--sub); }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <h1>今日訓練：全身代謝循環</h1>
-            <div class="subtitle">v2.0 含動作搜尋與計時</div>
-            <div class="user-stats">
-                <span class="stat-badge">🔥 預估 500+ kcal</span>
-                <span class="stat-badge">⏱️ 約 60 分鐘</span>
-            </div>
-        </header>
+<div class="app">
+    <header>
+        <h1>🔥 全身代謝燃脂 (v2.1)</h1>
+        <div class="stats">
+            <span class="badge">預估 500+ kcal</span>
+            <span class="badge">約 60 分鐘</span>
+        </div>
+    </header>
 
-        <!-- 熱身區塊 (含計時器) -->
-        <div class="card" style="border-left: 4px solid #FFC107;">
-            <div class="card-header">
-                <span class="card-title" style="color: #FFC107;">🚀 暖身啟動</span>
+    <!-- 熱身 -->
+    <div class="card" style="border-left: 4px solid #FFC107;">
+        <div class="head"><span class="title" style="color:#FFC107">🚀 暖身啟動</span></div>
+        <div>
+            <a href="https://www.google.com/search?tbm=isch&q=Elliptical+Machine+Workout" target="_blank" class="ex-link">滑步機 / 快走 🔍</a>
+            <div class="ex-meta">讓身體微熱，關節活動開來</div>
+        </div>
+        <div class="timer-box">
+            <span id="t-warm" class="time">05:00</span>
+            <button class="btn" onclick="runTimer(300, 't-warm', this)">開始計時</button>
+        </div>
+    </div>
+
+    <!-- Group 1 -->
+    <div class="card">
+        <div class="head"><span class="title">組合 1：腿推+胸推</span><span class="rest">休90秒</span></div>
+        <div class="pair">
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Leg+Press+Machine" target="_blank" class="ex-link">A. 坐姿腿推機 🔍</a>
+                <div class="ex-meta"><span>12 下 (做重)</span><span>腿部用力</span></div>
             </div>
-            <div class="exercise">
-                <div class="exercise-name">
-                    <a href="https://www.google.com/search?tbm=isch&q=Elliptical+Machine+Workout" target="_blank" class="search-link">滑步機 / 快走 <span class="search-icon">🔍</span></a>
-                </div>
-                <div class="exercise-meta">讓身體微熱，關節活動開來</div>
-            </div>
-            <!-- 計時器 -->
-            <div class="timer-box">
-                <div class="timer-display" id="warmup-display">05:00</div>
-                <button class="timer-btn" onclick="toggleTimer(300, 'warmup-display', this)">開始 5 分鐘計時</button>
+            <div class="arrow">⬇️ 不休息 ⬇️</div>
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Chest+Press+Machine" target="_blank" class="ex-link">B. 機械式胸推 🔍</a>
+                <div class="ex-meta"><span>12-15 下</span><span>背貼緊</span></div>
             </div>
         </div>
+        <div class="sets">
+            <label class="set"><span>1</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>2</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>3</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>4</span><input type="checkbox"><div class="circle"></div></label>
+        </div>
+    </div>
 
-        <!-- Super Set 1 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">組合 1：力量輸出</span>
-                <div class="rest-timer-badge">休 90秒</div>
+    <!-- Group 2 -->
+    <div class="card">
+        <div class="head"><span class="title">組合 2：後側鏈</span><span class="rest">休60秒</span></div>
+        <div class="pair">
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Seated+Leg+Curl+Machine" target="_blank" class="ex-link">A. 坐姿腿後勾 🔍</a>
+                <div class="ex-meta"><span>15-20 下</span><span>後側要酸</span></div>
             </div>
-            
-            <div class="exercise-pair">
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Leg+Press+Machine" target="_blank" class="search-link">A. 坐姿腿推機 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>12 下 (做重)</span>
-                        <span>腿部引擎全開</span>
-                    </div>
-                </div>
-                
-                <div class="connector">⬇️ 不休息直接做 ⬇️</div>
-
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Chest+Press+Machine" target="_blank" class="search-link">B. 機械式胸推 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>12-15 下</span>
-                        <span>背貼緊椅背</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sets-container">
-                <label class="set-box"><span class="set-label">1</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">2</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">3</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">4</span><input type="checkbox"><div class="check-circle"></div></label>
+            <div class="arrow">⬇️ 不休息 ⬇️</div>
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Seated+Cable+Row+Machine" target="_blank" class="ex-link">B. 坐姿划船 🔍</a>
+                <div class="ex-meta"><span>15-20 下 (輕)</span><span>頂峰收縮</span></div>
+                <div class="note">⚠️ 保護肩胛：動作放慢</div>
             </div>
         </div>
+        <div class="sets">
+            <label class="set"><span>1</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>2</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>3</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>4</span><input type="checkbox"><div class="circle"></div></label>
+        </div>
+    </div>
 
-        <!-- Super Set 2 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">組合 2：後鏈與控制</span>
-                <div class="rest-timer-badge">休 60秒</div>
+    <!-- Group 3 -->
+    <div class="card">
+        <div class="head"><span class="title">組合 3：代謝充血</span><span class="rest">休45秒</span></div>
+        <div class="pair">
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Leg+Extension+Machine" target="_blank" class="ex-link">A. 坐姿腿伸展 🔍</a>
+                <div class="ex-meta"><span>20 下</span><span>速度加快</span></div>
             </div>
-            
-            <div class="exercise-pair">
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Seated+Leg+Curl+Machine" target="_blank" class="search-link">A. 坐姿腿後勾 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>15-20 下</span>
-                        <span>大腿後側要酸</span>
-                    </div>
-                </div>
-
-                <div class="connector">⬇️ 不休息直接做 ⬇️</div>
-
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Seated+Cable+Row+Machine" target="_blank" class="search-link">B. 坐姿划船 / 滑輪下拉 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>15-20 下 (輕)</span>
-                        <span>頂峰收縮 1秒</span>
-                    </div>
-                    <div class="note">⚠️ 保護肩胛：動作放慢，不要甩</div>
-                </div>
-            </div>
-
-            <div class="sets-container">
-                <label class="set-box"><span class="set-label">1</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">2</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">3</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">4</span><input type="checkbox"><div class="check-circle"></div></label>
+            <div class="arrow">⬇️ 不休息 ⬇️</div>
+            <div>
+                <a href="https://www.google.com/search?tbm=isch&q=Pec+Deck+Machine" target="_blank" class="ex-link">B. 蝴蝶機 / 二頭 🔍</a>
+                <div class="ex-meta"><span>15-20 下</span><span>力竭</span></div>
             </div>
         </div>
+        <div class="sets">
+            <label class="set"><span>1</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>2</span><input type="checkbox"><div class="circle"></div></label>
+            <label class="set"><span>3</span><input type="checkbox"><div class="circle"></div></label>
+        </div>
+    </div>
 
-        <!-- Super Set 3 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">組合 3：代謝充血</span>
-                <div class="rest-timer-badge">休 45秒</div>
-            </div>
-            
-            <div class="exercise-pair">
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Leg+Extension+Machine" target="_blank" class="search-link">A. 坐姿腿伸展 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>20 下</span>
-                        <span>速度加快</span>
-                    </div>
-                </div>
+    <!-- Cardio Finisher -->
+    <div class="card" style="border: 1px solid var(--primary);">
+        <div class="head"><span class="title">🏃 燃脂收尾 (必做)</span></div>
+        <div class="grid">
+            <div class="g-item"><div class="g-val">30</div><div class="g-lbl">分鐘</div></div>
+            <div class="g-item"><div class="g-val">12-15</div><div class="g-lbl">坡度</div></div>
+            <div class="g-item"><div class="g-val">4.5</div><div class="g-lbl">速度</div></div>
+            <div class="g-item"><div class="g-val">130+</div><div class="g-lbl">心率</div></div>
+        </div>
+        <div style="text-align:center; margin-bottom:15px;">
+            <a href="https://www.google.com/search?tbm=isch&q=Incline+Treadmill+Walking" target="_blank" class="ex-link">跑步機爬坡快走 🔍</a>
+            <div class="note">手不抓扶手，核心收緊</div>
+        </div>
+        <div class="timer-box">
+            <span id="t-cardio" class="time">30:00</span>
+            <button class="btn" onclick="runTimer(1800, 't-cardio', this)">開始 30 分鐘計時</button>
+        </div>
+    </div>
+</div>
 
-                <div class="connector">⬇️ 不休息直接做 ⬇️</div>
+<script>
+    let timers = {};
+    
+    function runTimer(seconds, id, btn) {
+        // 如果正在跑，則停止 (重置)
+        if(timers[id]) {
+            clearInterval(timers[id]);
+            delete timers[id];
+            btn.textContent = "重新開始";
+            btn.classList.remove('stop');
+            btn.style.opacity = "1";
+            return;
+        }
 
-                <div class="exercise">
-                    <div class="exercise-name">
-                        <a href="https://www.google.com/search?tbm=isch&q=Pec+Deck+Machine" target="_blank" class="search-link">B. 蝴蝶機夾胸 / 二頭 <span class="search-icon">🔍</span></a>
-                    </div>
-                    <div class="exercise-meta">
-                        <span>15-20 下</span>
-                        <span>榨乾最後力氣</span>
-                    </div>
-                </div>
-            </div>
+        // 開始計時
+        let left = seconds;
+        btn.textContent = "停止 / 重置";
+        btn.classList.add('stop');
+        
+        timers[id] = setInterval(() => {
+            left--;
+            let m = Math.floor(left / 60).toString().padStart(2, '0');
+            let s = (left % 60).toString().padStart(2, '0');
+            document.getElementById(id).textContent = `${m}:${s}`;
 
-            <div class="sets-container">
-                <label class="set-box"><span class="set-label">1</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">2</span><input type="checkbox"><div class="check-circle"></div></label>
-                <label class="set-box"><span class="set-label">3</sp
+            if(left <= 0) {
+                clearInterval(timers[id]);
+                delete timers[id];
+                btn.textContent = "完成！";
+                btn.classList.remove('stop');
+                if(navigator.vibrate) navigator.vibrate([200,100,200]);
+                alert("時間到！");
+            }
+        }, 1000);
+    }
+    
+    // Checkbox 點擊震動
+    document.querySelectorAll('input').forEach(i => {
+        i.addEventListener('change', function() {
+            if(this.checked && navigator.vibrate) navigator.vibrate(30);
+        })
+    });
+</script>
+
+</body>
+</html>
