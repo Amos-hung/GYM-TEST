@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>極速燃脂 v9.4</title>
+    <title>混合戰術 v11.0</title>
     <style>
         :root {
-            --primary: #00E676;
+            --primary: #2979FF; /* 改成活力藍，代表混合戰術 */
             --bg: #121212;
             --card-bg: #1E1E1E;
             --text: #FFFFFF;
@@ -14,6 +14,7 @@
             --btn-color: #2C2C2C;
             --done-green: #00C853;
             --overlay-bg: rgba(0,0,0,0.95);
+            --tab-inactive: #333;
         }
 
         body {
@@ -21,7 +22,7 @@
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 15px;
+            padding: 0; /* 為了Tab滿版 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -29,19 +30,58 @@
             user-select: none;
         }
 
+        /* Tabs Navigation */
+        .tabs {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            display: flex;
+            background: var(--bg);
+            z-index: 100;
+            padding: 10px 10px 0 10px;
+            box-sizing: border-box;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--tab-inactive);
+            color: var(--sub);
+            border: none;
+            border-radius: 12px 12px 0 0;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
         .container {
             width: 100%;
             max-width: 450px;
-            display: flex;
+            padding: 15px;
+            padding-bottom: 80px;
+            display: none; /* 預設隱藏，靠JS控制顯示 */
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 60px;
+            box-sizing: border-box;
         }
 
+        .container.active-view {
+            display: flex;
+        }
+
+        /* Headers */
         header { width: 100%; margin-bottom: 5px; }
         h1 { font-size: 22px; margin: 0; font-weight: 800; }
         .subtitle { color: var(--sub); font-size: 13px; margin-top: 5px; }
 
+        /* Super Box */
         .super-box {
             background: var(--card-bg);
             border-radius: 16px;
@@ -66,7 +106,6 @@
             position: relative;
             z-index: 10;
         }
-
         .super-box.finished .box-left { opacity: 0.5; }
 
         .box-right {
@@ -81,8 +120,7 @@
             text-align: center;
             z-index: 10;
         }
-
-        .box-right:active { background: var(--primary); color: #000; }
+        .box-right:active { background: var(--primary); color: #fff; }
         .super-box.finished .box-right { background: var(--done-green); color: #fff; }
 
         .action-text {
@@ -105,6 +143,15 @@
         .ex-link:active { color: var(--primary); }
         .arrow { font-size: 12px; color: var(--sub); margin: 2px 0 5px 0; }
 
+        .cardio-box { background: #222; border: 1px dashed var(--primary); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
+        .cardio-link { color: #fff; text-decoration: none; display: block; }
+
+        .reset-all-btn {
+            background: #333; color: #888; border: 1px solid #444;
+            padding: 15px; width: 100%; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: bold; margin-bottom: 20px;
+        }
+
         #timer-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--overlay-bg); z-index: 999;
@@ -113,91 +160,157 @@
             opacity: 0; pointer-events: none; transition: 0.3s;
         }
         #timer-overlay.show { opacity: 1; pointer-events: auto; }
-
         .timer-big { font-size: 90px; font-family: monospace; font-weight: bold; color: var(--primary); }
         .timer-lbl { font-size: 20px; color: #fff; margin-bottom: 20px; }
         .timer-btn { background: #333; color: white; border: 1px solid #555; padding: 10px 40px; border-radius: 30px; font-size: 16px; margin-top: 30px; }
-
-        .cardio-box { background: #222; border: 1px dashed var(--primary); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
-        .cardio-link { color: #fff; text-decoration: none; display: block; }
-
-        .reset-all-btn {
-            background: #333; color: #888; border: 1px solid #444;
-            padding: 15px; width: 100%; border-radius: 8px;
-            cursor: pointer; font-size: 14px; font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<!-- 頂部頁籤 -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('A')">週一：A菜單</button>
+    <button class="tab-btn" onclick="switchTab('B')">週三：B菜單</button>
+</div>
+
+<!-- ================= A 菜單 (推+腿前) ================= -->
+<div class="container active-view" id="menu-A">
     <header>
-        <h1>直覺燃脂 v9.4</h1>
-        <div class="subtitle">更新：動作修正與安全優化</div>
+        <h1>週一：推 + 腿前側</h1>
+        <div class="subtitle">目標：深蹲強度 & 胸肩線條</div>
     </header>
 
-    <!-- BOX 1 -->
-    <div class="super-box" id="box-1">
+    <!-- BOX A1: 主項深蹲 -->
+    <div class="super-box" id="box-A-1">
         <div class="box-left">
-            <div class="bubble-container" id="bubbles-1">
+            <div class="bubble-container" id="bubbles-A-1">
                 <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
             </div>
-            <div class="group-title">組合 1 <span class="rest-tag">休 90秒</span></div>
-            <a href="https://www.google.com/search?tbm=isch&q=Leg+Press+Machine" target="_blank" class="ex-link">A. 腿推機 (12下) 🔗</a>
-            <div class="arrow">⬇️ 不休息接</div>
-            <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Bench+Press" target="_blank" class="ex-link">B. 啞鈴臥推 (12下) 🔗</a>
+            <div class="group-title">主項：傳統組 <span class="rest-tag">休 150秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Barbell+Squat" target="_blank" class="ex-link">A. 槓鈴深蹲 (8-10下) 🔗</a>
+            <div style="font-size:12px; color:#888; margin-top:10px;">目標 70kg / 每一下都要蹲得漂亮</div>
         </div>
-        <div class="box-right" onclick="handleSet(1, 90)">
-            <div class="check-icon" id="icon-1">✔</div>
-            <div class="action-text" id="text-1">完成休息</div>
+        <div class="box-right" onclick="handleSet('A', 1, 150)">
+            <div class="check-icon" id="icon-A-1">✔</div>
+            <div class="action-text" id="text-A-1">完成休息</div>
         </div>
     </div>
 
-    <!-- BOX 2: 強制換回安全動作 -->
-    <div class="super-box" id="box-2">
+    <!-- BOX A2: 胸腹超級組 -->
+    <div class="super-box" id="box-A-2">
         <div class="box-left">
-            <div class="bubble-container" id="bubbles-2">
+            <div class="bubble-container" id="bubbles-A-2">
                 <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
             </div>
-            <div class="group-title">組合 2 (護腰版) <span class="rest-tag">休 60秒</span></div>
-            <a href="https://www.google.com/search?tbm=isch&q=High+Stance+Leg+Press" target="_blank" class="ex-link">A. 高腳位腿推 (15下) 🔗</a>
+            <div class="group-title">超級組：胸+腹 <span class="rest-tag">休 90秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Barbell+Bench+Press" target="_blank" class="ex-link">A. 槓鈴/啞鈴臥推 (12下) 🔗</a>
             <div class="arrow">⬇️ 不休息接</div>
-            <a href="https://www.google.com/search?tbm=isch&q=Lat+Pulldown+Machine" target="_blank" class="ex-link">B. 固定式下拉 (15下) 🔗</a>
+            <a href="https://www.google.com/search?tbm=isch&q=Cable+Crunch" target="_blank" class="ex-link">B. 跪姿滑輪捲腹 (15下) 🔗</a>
         </div>
-        <div class="box-right" onclick="handleSet(2, 60)">
-            <div class="check-icon" id="icon-2">✔</div>
-            <div class="action-text" id="text-2">完成休息</div>
+        <div class="box-right" onclick="handleSet('A', 2, 90)">
+            <div class="check-icon" id="icon-A-2">✔</div>
+            <div class="action-text" id="text-A-2">完成休息</div>
         </div>
     </div>
 
-    <!-- BOX 3: 更新為肩推 -->
-    <div class="super-box" id="box-3">
+    <!-- BOX A3: 肩臂超級組 -->
+    <div class="super-box" id="box-A-3">
         <div class="box-left">
-            <div class="bubble-container" id="bubbles-3">
+            <div class="bubble-container" id="bubbles-A-3">
                 <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
             </div>
-            <div class="group-title">組合 3 <span class="rest-tag">休 45秒</span></div>
-            <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Split+Squat" target="_blank" class="ex-link">A. 分腿蹲 (20下) 🔗</a>
+            <div class="group-title">超級組：肩+三頭 <span class="rest-tag">休 60秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Dumbbell+Shoulder+Press" target="_blank" class="ex-link">A. 啞鈴肩推 (12下) 🔗</a>
             <div class="arrow">⬇️ 不休息接</div>
-            <a href="https://www.google.com/search?tbm=isch&q=Machine+Shoulder+Press" target="_blank" class="ex-link">B. 固定式肩推 (15下) 🔗</a>
+            <a href="https://www.google.com/search?tbm=isch&q=Tricep+Pushdown" target="_blank" class="ex-link">B. 三頭滑輪下壓 (15下) 🔗</a>
         </div>
-        <div class="box-right" onclick="handleSet(3, 45)">
-            <div class="check-icon" id="icon-3">✔</div>
-            <div class="action-text" id="text-3">完成休息</div>
+        <div class="box-right" onclick="handleSet('A', 3, 60)">
+            <div class="check-icon" id="icon-A-3">✔</div>
+            <div class="action-text" id="text-A-3">完成休息</div>
         </div>
     </div>
 
-    <!-- Cardio -->
+    <!-- Cardio A -->
     <div class="cardio-box">
         <a href="https://www.google.com/search?q=Incline+Treadmill+Walking" target="_blank" class="cardio-link">
-            🏃 跑步機爬坡 30分鐘<br>
-            <span style="font-size:12px; color:#888;">坡度 10 / 速度 2.5 / 心率 140</span>
+            🏃 跑步機爬坡 20-30分鐘<br>
+            <span style="font-size:12px; color:#aaa;">坡度 10-12 / 速度 3-4</span>
         </a>
     </div>
 
-    <button class="reset-all-btn" onclick="resetAll()">🔄 開始新的一天 (重置)</button>
+    <button class="reset-all-btn" onclick="resetMenu('A')">🔄 重置 A 菜單</button>
 </div>
 
+
+<!-- ================= B 菜單 (拉+腿後) ================= -->
+<div class="container" id="menu-B">
+    <header>
+        <h1>週三：拉 + 腿後側</h1>
+        <div class="subtitle">目標：鞏固後側鏈 & 背部厚度</div>
+    </header>
+
+    <!-- BOX B1: 主項 RDL -->
+    <div class="super-box" id="box-B-1">
+        <div class="box-left">
+            <div class="bubble-container" id="bubbles-B-1">
+                <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+            </div>
+            <div class="group-title">主項：傳統組 <span class="rest-tag">休 120秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Romanian+Deadlift" target="_blank" class="ex-link">A. 羅馬尼亞硬舉 (8-10下) 🔗</a>
+            <div style="font-size:12px; color:#888; margin-top:10px;">目標 60kg / 下背要直</div>
+        </div>
+        <div class="box-right" onclick="handleSet('B', 1, 120)">
+            <div class="check-icon" id="icon-B-1">✔</div>
+            <div class="action-text" id="text-B-1">完成休息</div>
+        </div>
+    </div>
+
+    <!-- BOX B2: 背部超級組 -->
+    <div class="super-box" id="box-B-2">
+        <div class="box-left">
+            <div class="bubble-container" id="bubbles-B-2">
+                <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+            </div>
+            <div class="group-title">超級組：背部充血 <span class="rest-tag">休 90秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Lat+Pulldown" target="_blank" class="ex-link">A. 滑輪下拉 (12下) 🔗</a>
+            <div class="arrow">⬇️ 不休息接</div>
+            <a href="https://www.google.com/search?tbm=isch&q=Seated+Cable+Row" target="_blank" class="ex-link">B. 坐姿划船 (12下) 🔗</a>
+        </div>
+        <div class="box-right" onclick="handleSet('B', 2, 90)">
+            <div class="check-icon" id="icon-B-2">✔</div>
+            <div class="action-text" id="text-B-2">完成休息</div>
+        </div>
+    </div>
+
+    <!-- BOX B3: 腿後二頭超級組 -->
+    <div class="super-box" id="box-B-3">
+        <div class="box-left">
+            <div class="bubble-container" id="bubbles-B-3">
+                <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+            </div>
+            <div class="group-title">超級組：腿後+二頭 <span class="rest-tag">休 60秒</span></div>
+            <a href="https://www.google.com/search?tbm=isch&q=Leg+Curl" target="_blank" class="ex-link">A. 腿後勾 (12-15下) 🔗</a>
+            <div class="arrow">⬇️ 不休息接</div>
+            <a href="https://www.google.com/search?tbm=isch&q=Bicep+Curl" target="_blank" class="ex-link">B. 二頭肌彎舉 (12下) 🔗</a>
+        </div>
+        <div class="box-right" onclick="handleSet('B', 3, 60)">
+            <div class="check-icon" id="icon-B-3">✔</div>
+            <div class="action-text" id="text-B-3">完成休息</div>
+        </div>
+    </div>
+
+    <!-- Cardio B -->
+    <div class="cardio-box">
+        <a href="https://www.google.com/search?q=Assault+Bike+Intervals" target="_blank" class="cardio-link">
+            🚴‍♂️ 風扇車 / 划船機 10-15分鐘<br>
+            <span style="font-size:12px; color:#aaa;">間歇衝刺：快30秒 / 慢30秒</span>
+        </a>
+    </div>
+
+    <button class="reset-all-btn" onclick="resetMenu('B')">🔄 重置 B 菜單</button>
+</div>
+
+<!-- Timer Overlay -->
 <div id="timer-overlay">
     <div class="timer-lbl">休息中...</div>
     <div class="timer-big" id="overlay-time">00:00</div>
@@ -205,40 +318,67 @@
 </div>
 
 <script>
-    let progress = JSON.parse(localStorage.getItem('gymProgress')) || { 1: 0, 2: 0, 3: 0 };
+    // 初始化進度，分 A 和 B 兩組資料
+    let progress = JSON.parse(localStorage.getItem('gymProgress_v11')) || {
+        'A': { 1: 0, 2: 0, 3: 0 },
+        'B': { 1: 0, 2: 0, 3: 0 }
+    };
+    
+    // 記住上次選的 Tab
+    let currentTab = localStorage.getItem('lastTab') || 'A';
+    
     let timerInterval = null;
 
-    updateUI(1); updateUI(2); updateUI(3);
+    // 初始化頁面
+    switchTab(currentTab);
+    updateAllUI();
 
-    function handleSet(groupId, sec) {
-        let bubbles = document.querySelectorAll(`#bubbles-${groupId} .bubble`);
-        let current = progress[groupId];
+    function switchTab(tab) {
+        currentTab = tab;
+        localStorage.setItem('lastTab', tab);
         
+        // 隱藏所有 Container
+        document.querySelectorAll('.container').forEach(el => el.classList.remove('active-view'));
+        // 顯示選中的 Container
+        document.getElementById(`menu-${tab}`).classList.add('active-view');
+        
+        // 更新按鈕樣式
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        // 簡單透過文字判斷有點粗糙，改用 onclick 觸發重繪
+        const btns = document.querySelectorAll('.tab-btn');
+        if(tab === 'A') btns[0].classList.add('active');
+        else btns[1].classList.add('active');
+    }
+
+    function handleSet(menu, boxId, sec) {
+        let bubbles = document.querySelectorAll(`#bubbles-${menu}-${boxId} .bubble`);
+        let current = progress[menu][boxId];
+
         if(current >= bubbles.length) {
-            if(confirm('重置這組的進度嗎？')) {
-                progress[groupId] = 0;
+            if(confirm('重置這組進度？')) {
+                progress[menu][boxId] = 0;
                 saveProgress();
-                updateUI(groupId);
+                updateUI(menu, boxId);
             }
             return;
         }
 
         if(navigator.vibrate) navigator.vibrate(50);
-        progress[groupId]++;
+        progress[menu][boxId]++;
         saveProgress();
-        updateUI(groupId);
+        updateUI(menu, boxId);
 
-        if (progress[groupId] <= bubbles.length) {
+        if (progress[menu][boxId] <= bubbles.length) {
             startTimer(sec);
         }
     }
 
-    function updateUI(groupId) {
-        let box = document.getElementById(`box-${groupId}`);
-        let bubbles = document.querySelectorAll(`#bubbles-${groupId} .bubble`);
-        let icon = document.getElementById(`icon-${groupId}`);
-        let text = document.getElementById(`text-${groupId}`);
-        let current = progress[groupId];
+    function updateUI(menu, boxId) {
+        let box = document.getElementById(`box-${menu}-${boxId}`);
+        let bubbles = document.querySelectorAll(`#bubbles-${menu}-${boxId} .bubble`);
+        let icon = document.getElementById(`icon-${menu}-${boxId}`);
+        let text = document.getElementById(`text-${menu}-${boxId}`);
+        let current = progress[menu][boxId];
 
         bubbles.forEach((b, index) => {
             if(index < current) b.classList.add('active');
@@ -256,15 +396,21 @@
         }
     }
 
-    function saveProgress() {
-        localStorage.setItem('gymProgress', JSON.stringify(progress));
+    function updateAllUI() {
+        ['A', 'B'].forEach(m => {
+            [1, 2, 3].forEach(id => updateUI(m, id));
+        });
     }
 
-    function resetAll() {
-        if(confirm('要重置所有進度嗎？')) {
-            progress = { 1: 0, 2: 0, 3: 0 };
+    function saveProgress() {
+        localStorage.setItem('gymProgress_v11', JSON.stringify(progress));
+    }
+
+    function resetMenu(menu) {
+        if(confirm(`確定要重置 ${menu} 菜單的所有進度嗎？`)) {
+            progress[menu] = { 1: 0, 2: 0, 3: 0 };
             saveProgress();
-            updateUI(1); updateUI(2); updateUI(3);
+            updateAllUI();
         }
     }
 
